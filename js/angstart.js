@@ -88,10 +88,10 @@
 		
 		$scope.delEmoji = function(emoji){
 			//console.log(emoji);
-			if (emoji.cat!="del"){
+			if (emoji.cat=="all"){
 				emoji.cat="del";
 				emoji.css.data="img-no-transparent";
-			}else{
+			}else if (emoji.cat=="fav"){
 				emoji.cat="all";
 				emoji.css.data="img-transparent";
 			}
