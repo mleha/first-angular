@@ -8,31 +8,40 @@
   angular
   .module('app', ['ngStorage'])
   .controller('AppController', ['$scope', '$compile','$http','$localStorage','$filter',function($scope,$compile,$http,$localStorage,$filter) {
-		$scope.sections = { 'fav':'Любимые',
-							'all':'Все',
-							'del':'Удаленные'};
-							
-		//console.log($scope.sections);
-		$scope.search = {};
-		$scope.search.cat='all';
 		
-		$scope.page = window.location.hash.substr(1) || 'all';
-		//$scope.stored = $localStorage.myvar || 1;
-		$scope.sectVar = $scope.page;//$localStorage.sectVar || 'all';
-		$scope.localEmojis =  $localStorage.emojis || [];
-		
-		$scope.stored++;
-		$scope.section = $scope.sections[$scope.page];
+		$scope.init = function (){
+			$scope.sections = { 'fav':{'name':'Любимые'},
+								'all':{'name':'Все'},
+								'del':{'name':'Удаленные'}};
+			
+			// for(var sect in $scope.sections){
+				// $scope.sections[sect].css = {};
+				// $scope.sections[sect].css.data="btn-info";
+			// }
+			
+			pushCSS_ToObject($scope.sections, "btn-info");
+			
+			//console.log($scope.sections);
+			$scope.search = {};
+			
+			$scope.page = window.location.hash.substr(1) || 'all';
+			$scope.sections[$scope.page].css.data="btn-warning";
+			$scope.section = $scope.sections[$scope.page];
+			//$scope.sectVar = $scope.page;//$localStorage.sectVar || 'all';
+			$scope.localEmojis =  $localStorage.emojis || [];
+			
+			//$scope.stored++;
 
-		$http({
-			method : "GET",
-			url : "https://api.github.com/emojis"
-		}).then(function mySuccess(response) {
-			$scope.emojis = response.data;
-			//console.log($scope.emojis);
-			updateEmojis( response.data);
-			console.log($scope);
-		});
+			$http({
+				method : "GET",
+				url : "https://api.github.com/emojis"
+			}).then(function mySuccess(response) {
+				$scope.emojis = response.data;
+				//console.log($scope.emojis);
+				updateEmojis( response.data);
+				//console.log($scope);
+			});		
+		}
 		
 		function updateEmojis(emojis){
 			for(var id in emojis){
@@ -46,87 +55,82 @@
 				}
 			}
 			$localStorage.emojis = $scope.localEmojis;
+			pushCSS_ToObject($scope.localEmojis, "img-transparent");
 		}
 		
-		//function drawEmojis(){
-		//	var table = angular.element(document.querySelector('#tablebody'));
-		//	table.html('<tr ng-repeat="(id,emoji) in localEmojis | fsearch">\
-		//			<td>{{ id }}</td>\
-		//			<td>{{ emoji.url }}</td>\
-		//			<td><img class="preview" src="{{ emoji.url }}"></td>\
-		//			<td>actions</td>\
-		//		</tr>');
-		//	$compile(table.contents())($scope);
-		//
-		//}
-		//$localStorage.myvar=$scope.stored;
+		function pushCSS_ToObject(arr,data,q=null){
+			angular.forEach(arr,function(item){
+				if (item.css == undefined) item.css = {'data':data} 
+				
+			});
+		}
+		
+		$scope.makeFavorive = function(emoji){
+			//console.log(emoji);
+			emoji.cat="fav";
+			emoji.css.data="img-no-transparent";
+		}
+		
+		$scope.check_visible = function(button){
+			//console.log(button);
+			
+			if (button=="fav" && $scope.page=="all") return "img-visible";
+			if (button=="restore" && $scope.page=="del") return "img-visible";
+			if (button=="del" && $scope.page!="del") return "img-visible";
+			
+			return "img-hidden";
+		}
+		
+		$scope.restoreEmoji = function(emoji){
+			emoji.cat="all";
+			emoji.css.data="img-transparent";
+		}
+		
+		$scope.delEmoji = function(emoji){
+			//console.log(emoji);
+			if (emoji.cat!="del"){
+				emoji.cat="del";
+				emoji.css.data="img-no-transparent";
+			}else{
+				emoji.cat="all";
+				emoji.css.data="img-transparent";
+			}
+		}
 		
 		$scope.selectSection = function (section){
+			$scope.page=section;
 			$scope.section=$scope.sections[section];
-			$scope.sectVar=section;
-			//$localStorage.sectVar=section;
+			angular.forEach($scope.sections,function(item){ item.css.data = "btn-info"; });
+			$scope.sections[section].css.data="btn-warning";
 		}
-		
-		$scope.func2 = function (e){
-			//alert(1);
-			$http({
-				method : "GET",
-				url : "https://api.github.com/emojis"
-			}).then(function mySuccess(response) {
-				$scope.emojis = response.data;
 
-			var currentElement = angular.element(document.querySelector('#tablebody'));// angular.element('#tid');
-			
-			currentElement.html("<button ng-click='func2()'>new click</button>\
-			<div>{{ tvar }}</div>\
-			<table>\
-			  <tr>\
-			 <th>A</th>\
-			 <th>N</th>\
-			  </tr>\
-			  <tr ng-repeat=\"(id,nn) in tvar\">\
-			 <td>{{ id }}</td>\
-			 <td>{{ nn }}</td>\
-			  </tr>\
-			</table>\
-			");
-			$compile(currentElement.contents())($scope);
-				
-				
-			}, function myError(response) {
-				$scope.tvar = response.statusText;
-			});
-			
-		};
-		
-		$scope.MyClick = function (e){
-			//console.log(e);
-			//console.log($this);
-			//console.log(this); // $scope
-			//alert(1);
-			var currentElement = angular.element(document.querySelector('#tid'));// angular.element('#tid');
-			
-			currentElement.html("<button ng-click='func2()'>new click</button>\
-			<div>{{ tvar }}</div>\
-			");
-			
-			$compile(currentElement.contents())($scope);
-			
-			//currentElement.html();
-			
-		};
-		
 		
 		$scope.changeUsername = function(username) {
 		  $scope.test = username;
 		};
 	
+	
+		$scope.init();
+	
   }]);
   
 	myApp.filter('category', function() {
-	  return function(input) {
-		console.log($scope.page + ' = ?? = ' + input.cat);
-		return input.cat==$scope.page;
+	  return function(items,scope) {
+		var filtered=[];
+		for(var n in items){
+			var item = items[n];
+			//console.log(scope.page + ' = ?? = ' + item.cat);
+			switch (scope.page){
+				case "all":
+					if(item.cat=="all" || item.cat=="fav")filtered.push(item);
+				break;
+				case "fav":
+				case "del":
+					if(item.cat==scope.page)filtered.push(item);
+				break;
+			}
+		}
+		return filtered;
 	  }
 	});
 	

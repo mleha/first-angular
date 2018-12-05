@@ -2,3 +2,19 @@
 	width:25px;
 	height:25px;
 }
+.img-transparent{
+	opacity:.4;
+}
+.img-no-transparent{
+	opacity:1;
+}
+.pointer{
+	cursor: pointer;
+}
+.img-visible{
+	display:inline-block;
+}
+
+.img-hidden{
+	display:none;
+}
