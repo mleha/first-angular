@@ -21,7 +21,7 @@
 				{{ section.name }}
 			</div>
 			<div class="form-group col-lg-4 col-md-4 col-xs-4">
-				<input type="text" class="form-control" placeholder="Поиск..." ng-model="search.id">
+				<input type="text" class="form-control" placeholder="Поиск..." ng-change="do_search()" ng-model="search.id">
 			</div>
 		</div>
 		<div class="row">
@@ -33,10 +33,13 @@
 					<th scope="col" class="col-md-auto">Действия</th>
 				</thead>
 				<tbody id="tablebody">
-					<tr ng-repeat="emoji in localEmojis | filter:search|category:this">
+					<tr ng-repeat="emoji in curpage">
 						<td>{{ emoji.id }}</td>
 						<td>{{ emoji.url }}</td>
-						<td><img class="preview {{ emoji.css.data }}" src="{{ emoji.url }}"></td>
+						<td><img class="preview {{ emoji.css.data }}" src="{{ emoji.url }}"
+								ng-mousemove="img_move(this,$event)"
+								ng-mouseleave="img_out()"
+								ng-mouseover="img_over(this)" ></td>
 						<td>
 							<img class="pointer {{ check_visible('fav') }}" ng-click="makeFavorive(emoji)" src="img/star.png">
 							<img class="pointer {{ check_visible('del') }}" ng-click="delEmoji(emoji)" src="img/del.png">
@@ -44,16 +47,34 @@
 						</td>
 					</tr>
 				</tbody>
-			
 			</table>
+			        <ul ng-if="pages.length>1" class="pagination">
+						<li class="page-item" ng-class="{disabled:curpagen == 0}">
+							<a class="page-link" ng-click="setPage(0)">First</a>
+						</li>
+						<li class="page-item" ng-class="{disabled:curpagen == 0}">
+							<a class="page-link" ng-click="setPage(curpagen - 1)">Previous</a>
+						</li>
+						<li class="page-item" ng-repeat="id in pagesn" ng-class="{active:curpagen == id}">
+							<a class="page-link" ng-click="setPage(id)">{{id+1}}</a>
+						</li>                
+						<li class="page-item" ng-class="{disabled:curpagen == (pagecount-1)}">
+							<a class="page-link" ng-click="setPage(curpagen + 1)">Next</a>
+						</li>
+						<li class="page-item" ng-class="{disabled:curpagen == (pagecount-1)}">
+							<a class="page-link" ng-click="setPage(pagecount-1)">Last</a>
+						</li>
+					</ul>
 		</div>
 		
 		
 	</div>
 </div>
 	
-
+<div class="fixed {{ imgdiv }}" style="{{img_div_style}}">
+	<img src="{{ fullimg }}" >
 </div>
 
+</div>
 </body>
 </html>
