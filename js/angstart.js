@@ -10,7 +10,7 @@
 								'all':{'name':'Все'},
 								'del':{'name':'Удаленные'}};
 			
-			pushCSS_ToObject($scope.sections, "btn-info");
+			push_CSS_to_object($scope.sections, "btn-info");
 			
 			$scope.search = {};
 			$scope.search.id="";
@@ -31,7 +31,7 @@
 				url : "https://api.github.com/emojis"
 			}).then(function mySuccess(response) {
 				$scope.emojis = response.data;
-				updateEmojis( response.data);
+				update_emojis( response.data);
 				$scope.do_search();
 			});		
 		}
@@ -39,7 +39,7 @@
 		//=======================================================
 		//    service functions
 		//------------------------------------------------		
-		function updateEmojis(emojis){
+		function update_emojis(emojis){
 			for(var id in emojis){
 				var found = $filter('getById')($scope.localEmojis, id);
 				
@@ -49,10 +49,10 @@
 					$scope.localEmojis.push({'id':id,'url':emojis[id], 'cat':'all'});
 			}
 			$localStorage.emojis = $scope.localEmojis;
-			pushCSS_ToObject($scope.localEmojis, "img-transparent");
+			push_CSS_to_object($scope.localEmojis, "img-transparent");
 		}
 		
-		function pushCSS_ToObject(arr,data){
+		function push_CSS_to_object(arr,data){
 			angular.forEach(arr,function(item){
 				if (item.css == undefined) item.css = {'data':data} 
 			});
@@ -85,8 +85,14 @@
 				$scope.pages.push(onepage);
 			}
 			$scope.curpage = $scope.pages[0];
-			$scope.setPage(0);
+			$scope.set_page(0);
 		}
+		function redraw_emoji_list(){
+			var old_page = $scope.curpagen;
+			$scope.do_search();
+			if(old_page == $scope.pagecount) old_page = $scope.pagecount-1;
+			$scope.set_page(old_page);			
+		}		
 		//=======================================================
 		//              events/listeners
 		//------------------------------------------------
@@ -108,22 +114,19 @@
 			if (button=="del" && $scope.page!="del") return "img-visible";
 			return "img-hidden";
 		}
-		$scope.selectSection = function (section){
+		$scope.select_section = function (section){
 			$scope.page=section;
 			$scope.section=$scope.sections[section];
 			angular.forEach($scope.sections,function(item){ item.css.data = "btn-info"; });
 			$scope.sections[section].css.data="btn-warning";
 			$scope.do_search();
 		}
-		$scope.changeUsername = function(username) {
-		  $scope.test = username;
-		}
 		$scope.do_search = function(){
 			var filterd =  $filter('category')($scope.localEmojis, $scope);
 			$scope.found = $filter('searchById')(filterd, $scope.search.id);
 			split_found();
 		}
-		$scope.setPage = function(page){
+		$scope.set_page = function(page){
 			if (page < 0 || page > $scope.pagecount-1) return;
 			$scope.curpagen = page;
 			if($scope.pagecount>10){
@@ -143,26 +146,24 @@
 			for(var i = start;i<end;i++){
 				$scope.pagesn.push(i);
 			}
-			console.log($scope.pagesn);
 			$scope.curpage = $scope.pages[page];
-			
 		}
 		
 		//================================================
 		//    emoji actions
 		//------------------------------------------------
-		$scope.makeFavorive = function(emoji){
+		$scope.make_favorive = function(emoji){
 			emoji.cat="fav";
 			emoji.css.data="img-no-transparent";
 		}
 		
-		$scope.restoreEmoji = function(emoji){
+		$scope.restore_emoji = function(emoji){
 			emoji.cat="all";
 			emoji.css.data="img-transparent";
-			$scope.reDrawEmojiList();
+			redraw_emoji_list();
 		}
 		
-		$scope.delEmoji = function(emoji){
+		$scope.del_emoji = function(emoji){
 			if (emoji.cat=="all" || (emoji.cat=="fav" && $scope.page=="all")){
 				emoji.cat="del";
 				emoji.css.data="img-no-transparent";
@@ -170,14 +171,9 @@
 				emoji.cat="all";
 				emoji.css.data="img-transparent";
 			}
-			$scope.reDrawEmojiList();
+			redraw_emoji_list();
 		}
-		$scope.reDrawEmojiList = function(){
-			var old_page = $scope.curpagen;
-			$scope.do_search();
-			if(old_page == $scope.pagecount) old_page = $scope.pagecount-1;
-			$scope.setPage(old_page);			
-		}
+
 		//================================================
 		$scope.init();
   }]);
@@ -187,7 +183,6 @@
 		var filtered=[];
 		for(var n in items){
 			var item = items[n];
-			//console.log(scope.page + ' = ?? = ' + item.cat);
 			switch (scope.page){
 				case "all":
 					if(item.cat=="all" || item.cat=="fav")filtered.push(item);

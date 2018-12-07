@@ -14,7 +14,7 @@
 
 <div class="row">
 	<div class="form-group col-lg-2 col-md-2 col-xs-5">
-		<a ng-repeat="(id,section) in sections" href="#{{ id }}" class="btn {{ section.css.data }} btn-block" role="button" ng-click="selectSection(id)">{{ section.name }}</a>
+		<a ng-repeat="(id,section) in sections" href="#{{ id }}" class="btn {{ section.css.data }} btn-block" role="button" ng-click="select_section(id)">{{ section.name }}</a>
 	</div>
 	<div class="form-group col-lg-10 col-md-10 col-xs-7">
 		<div class="row">
@@ -42,9 +42,9 @@
 								ng-mouseleave="img_out()"
 								ng-mouseover="img_over(this)" ></td>
 						<td class="center">
-							<img class="pointer {{ check_visible('fav') }}" ng-click="makeFavorive(emoji)" src="img/star.png">
-							<img class="pointer {{ check_visible('del') }}" ng-click="delEmoji(emoji)" src="img/del.png">
-							<img class="pointer {{ check_visible('restore') }}" ng-click="restoreEmoji(emoji)" src="img/restore.png">
+							<img class="pointer {{ check_visible('fav') }}" ng-click="make_favorive(emoji)" src="img/star.png">
+							<img class="pointer {{ check_visible('del') }}" ng-click="del_emoji(emoji)" src="img/del.png">
+							<img class="pointer {{ check_visible('restore') }}" ng-click="restore_emoji(emoji)" src="img/restore.png">
 						</td>
 					</tr>
 				</tbody>
@@ -55,19 +55,19 @@
 			<div class="inline-block">
 				<ul ng-if="pages.length>1" class="pagination">
 					<li class="page-item" ng-class="{disabled:curpagen == 0}">
-						<a class="page-link" ng-click="setPage(0)">Первая</a>
+						<a class="page-link" ng-click="set_page(0)">Первая</a>
 					</li>
 					<li class="page-item" ng-class="{disabled:curpagen == 0}">
-						<a class="page-link" ng-click="setPage(curpagen - 1)">Пред.</a>
+						<a class="page-link" ng-click="set_page(curpagen - 1)">Пред.</a>
 					</li>
 					<li class="page-item" ng-repeat="id in pagesn" ng-class="{active:curpagen == id}">
-						<a class="page-link" ng-click="setPage(id)">{{id+1}}</a>
+						<a class="page-link" ng-click="set_page(id)">{{id+1}}</a>
 					</li>                
 					<li class="page-item" ng-class="{disabled:curpagen == (pagecount-1)}">
-						<a class="page-link" ng-click="setPage(curpagen + 1)">След.</a>
+						<a class="page-link" ng-click="set_page(curpagen + 1)">След.</a>
 					</li>
 					<li class="page-item" ng-class="{disabled:curpagen == (pagecount-1)}">
-						<a class="page-link" ng-click="setPage(pagecount-1)">Последняя</a>
+						<a class="page-link" ng-click="set_page(pagecount-1)">Последняя</a>
 					</li>
 				</ul>
 			</div>
