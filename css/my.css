@@ -21,3 +21,26 @@
 .fixed{
 	position:fixed;
 }
+.center{
+	text-align:center;
+}
+.inline-block{
+	display:inline-block;
+}
+
+
+.w-10 {
+  width: 10%;
+}
+
+.w-15 {
+  width: 15%
+}
+
+.w-55 {
+  width: 55%;
+}
+
+table {
+  table-layout:fixed;/* will switch the table-layout algorythm */
+}
