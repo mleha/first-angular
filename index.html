@@ -6,6 +6,7 @@
 	<script type="text/javascript" src="js/angular.min.js"></script>
 	<script type="text/javascript" src="js/ngStorage.js"></script>
 	<script type="text/javascript" src="js/angstart.js"></script>
+	<title>Мои иконки @mleha</title>
 </head>
 <body>
 
@@ -18,7 +19,7 @@
 	<div class="form-group col-lg-10 col-md-10 col-xs-7">
 		<div class="row">
 			<div class="form-group col-lg-8 col-md-8 col-xs-8">
-				{{ section.name }}
+				<h4>{{ section.name }}</h4>
 			</div>
 			<div class="form-group col-lg-4 col-md-4 col-xs-4">
 				<input type="text" class="form-control" placeholder="Поиск..." ng-change="do_search()" ng-model="search.id">
@@ -40,7 +41,7 @@
 								ng-mousemove="img_move(this,$event)"
 								ng-mouseleave="img_out()"
 								ng-mouseover="img_over(this)" ></td>
-						<td>
+						<td class="center">
 							<img class="pointer {{ check_visible('fav') }}" ng-click="makeFavorive(emoji)" src="img/star.png">
 							<img class="pointer {{ check_visible('del') }}" ng-click="delEmoji(emoji)" src="img/del.png">
 							<img class="pointer {{ check_visible('restore') }}" ng-click="restoreEmoji(emoji)" src="img/restore.png">
@@ -76,7 +77,7 @@
 	</div>
 </div>
 	
-<div class="fixed {{ imgdiv }}" style="{{img_div_style}}">
+<div class="fixed {{ img_div_class }}" style="{{img_div_style}}">
 	<img src="{{ fullimg }}" >
 </div>
 

@@ -12,34 +12,26 @@
 			
 			pushCSS_ToObject($scope.sections, "btn-info");
 			
-			//console.log($scope.sections);
 			$scope.search = {};
 			$scope.search.id="";
-			//$scope.found = [];
-			$scope.imgdiv = 'img-hidden';
+			$scope.img_div_class = 'img-hidden';
 			$scope.img_div_style = '';
-			
 			$scope.page = window.location.hash.substr(1) || 'all';
-			//console.log($scope.page);
 			if ($scope.page!="fav" && $scope.page != "del") {
 				$scope.page="all";
 				window.location.hash="#all";
 			}
-			$scope.sections[$scope.page].css.data="btn-warning";
+			$scope.sections[$scope.page].css.data="btn-warning"; // active button
 			$scope.section = $scope.sections[$scope.page];
-			//$scope.sectVar = $scope.page;//$localStorage.sectVar || 'all';
 			$scope.localEmojis =  $localStorage.emojis || [];
 			$scope.found = $scope.localEmojis;
-			//$scope.stored++;
 
 			$http({
 				method : "GET",
 				url : "https://api.github.com/emojis"
 			}).then(function mySuccess(response) {
 				$scope.emojis = response.data;
-				//console.log($scope.emojis);
 				updateEmojis( response.data);
-				//console.log($scope);
 				$scope.do_search();
 			});		
 		}
@@ -65,8 +57,50 @@
 				if (item.css == undefined) item.css = {'data':data} 
 			});
 		}
+		function split_found(){
+			var img_in_page=10;
+			$scope.pagecount = Math.ceil($scope.found.length/img_in_page);
+			$scope.curpagen = 1;
+			$scope.pages = [];
+			$scope.pagesn = [];
+			
+			var onepage=[];
+			var n=0;
+			var pagen=0;
+			for(var i in $scope.found){
+				if(n==0){
+					$scope.pagesn.push(pagen);
+				}
+				var item = $scope.found[i];
+				n++;
+				onepage.push(item);
+				if(n==img_in_page){
+					$scope.pages.push(onepage);
+					n=0;
+					onepage=[];
+					pagen++;
+				}
+			}
+			if (n>0){
+				$scope.pages.push(onepage);
+			}
+			$scope.curpage = $scope.pages[0];
+			$scope.setPage(0);
+		}
 		//=======================================================
-		//    events/listeners
+		//              events/listeners
+		//------------------------------------------------
+		//              img event listeners
+		$scope.img_move = function(img,event) {
+			$scope.img_div_style = 'left:'+(event.clientX+3)+'px;top:'+(event.clientY+3)+'px';
+		}
+		$scope.img_over = function(img) {
+			$scope.img_div_class='img-visible';
+			$scope.fullimg=img.emoji.url;
+		}
+		$scope.img_out = function() {
+			$scope.img_div_class='img-hidden';
+		}
 		//------------------------------------------------
 		$scope.check_visible = function(button){
 			if (button=="fav" && $scope.page=="all") return "img-visible";
@@ -84,60 +118,12 @@
 		$scope.changeUsername = function(username) {
 		  $scope.test = username;
 		}
-		$scope.img_move = function(img,event) {
-			$scope.img_div_style = 'left:'+(event.clientX+3)+'px;top:'+(event.clientY+3)+'px';
-		}
-		$scope.img_over = function(img) {
-			$scope.imgdiv='img-visible';
-			$scope.fullimg=img.emoji.url;
-		}
-		$scope.img_out = function() {
-			$scope.imgdiv='img-hidden';
-		}
 		$scope.do_search = function(){
-			//console.log($scope.search.id);
 			var filterd =  $filter('category')($scope.localEmojis, $scope);
-			//console.log(filterd);
 			$scope.found = $filter('searchById')(filterd, $scope.search.id);
-			
-			//console.log($scope.found);
-			
-			$scope.pagecount = Math.ceil($scope.found.length/10);
-			$scope.curpagen = 1;
-			$scope.pages = [];
-			$scope.pagesn = [];
-			
-			var onepage=[];
-			var n=0;
-			var pagen=0;
-			for(var i in $scope.found){
-				if(n==0){
-					$scope.pagesn.push(pagen);
-				}
-			
-				var item = $scope.found[i];
-				n++;
-				onepage.push(item);
-				if(n==10){
-					$scope.pages.push(onepage);
-					n=0;
-					onepage=[];
-					//if (pagen<10) $scope.pagesn.push(pagen);
-					pagen++;
-				}
-			}
-			if (n>0){
-				$scope.pages.push(onepage);
-				//pagen++;
-			}
-			
-			//$scope.pagesn = _.range(1, pagecount + 1);
-			$scope.curpage = $scope.pages[0];
-			$scope.setPage(0);
-			console.log($scope.pagesn);
+			split_found();
 		}
 		$scope.setPage = function(page){
-			console.log(page);
 			if (page < 0 || page > $scope.pagecount-1) return;
 			$scope.curpagen = page;
 			if($scope.pagecount>10){
@@ -173,27 +159,24 @@
 		$scope.restoreEmoji = function(emoji){
 			emoji.cat="all";
 			emoji.css.data="img-transparent";
-
-			var old_page = $scope.curpagen;
-			$scope.do_search();
-			if(old_page == $scope.pagecount) old_page = $scope.pagecount-1;
-			$scope.setPage(old_page);
+			$scope.reDrawEmojiList();
 		}
 		
 		$scope.delEmoji = function(emoji){
-			//console.log(emoji);
-			if (emoji.cat=="all"){
+			if (emoji.cat=="all" || (emoji.cat=="fav" && $scope.page=="all")){
 				emoji.cat="del";
 				emoji.css.data="img-no-transparent";
-			}else if (emoji.cat=="fav"){
+			}else if (emoji.cat=="fav" && $scope.page=="fav"){
 				emoji.cat="all";
 				emoji.css.data="img-transparent";
 			}
-			
+			$scope.reDrawEmojiList();
+		}
+		$scope.reDrawEmojiList = function(){
 			var old_page = $scope.curpagen;
 			$scope.do_search();
 			if(old_page == $scope.pagecount) old_page = $scope.pagecount-1;
-			$scope.setPage(old_page);
+			$scope.setPage(old_page);			
 		}
 		//================================================
 		$scope.init();
